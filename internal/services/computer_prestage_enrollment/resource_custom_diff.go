@@ -126,14 +126,12 @@ func validateMinimumOSSpecificVersion(_ context.Context, diff *schema.ResourceDi
 			return fmt.Errorf("in 'jamfpro_computer_prestage_enrollment.%s': 'minimum_os_specific_version' must be set when 'prestate_minimum_os_target_version_type' is MINIMUM_OS_SPECIFIC_VERSION", resourceName)
 		}
 
-		validVersions := map[string]bool{
-			"14.5":   true,
-			"14.6":   true,
-			"14.6.1": true,
-		}
-
-		if !validVersions[specificVersion] {
-			return fmt.Errorf("in 'jamfpro_computer_prestage_enrollment.%s': 'minimum_os_specific_version' must be one of '14.5', '14.6', or '14.6.1', got: %s", resourceName, specificVersion)
+		// Validate format only: major.minor or major.minor.patch, at most 2 digits per segment.
+		// macOS has never used more than 2 digits per component (e.g. 105.310.3452 is invalid).
+		// Jamf API enforces which versions are supported; this avoids a provider-side allow list.
+		versionPattern := `^\d{1,2}\.\d{1,2}(\.\d{1,2})?$`
+		if match, _ := regexp.MatchString(versionPattern, specificVersion); !match {
+			return fmt.Errorf("in 'jamfpro_computer_prestage_enrollment.%s': 'minimum_os_specific_version' must be major.minor or major.minor.patch (at most 2 digits per part, e.g. 26.3 or 26.3.1), got: %s", resourceName, specificVersion)
 		}
 	}
 

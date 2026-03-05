@@ -94,9 +94,9 @@ func getPolicySchemaSelfService() *schema.Resource {
 			"notification_type": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "Self Service",
-				Description: "The type of notification. Valid values are 'Self Service' and 'Self Service and Notification Center'.",
+				Description: "The type of notification. API returns empty string when not set. Valid values are '' (API default), 'Self Service', and 'Self Service and Notification Center'.",
 				ValidateFunc: validation.StringInSlice([]string{
+					"",
 					"Self Service",
 					"Self Service and Notification Center",
 				}, false),
